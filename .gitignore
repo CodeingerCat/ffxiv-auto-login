@@ -1,0 +1,9 @@
+
+# Ignore system specific python files
+__pycache__
+
+# Ignore Virtual enviroment files
+ffxiv_auto_venv
+
+# Ignore personal configuration
+config.json
