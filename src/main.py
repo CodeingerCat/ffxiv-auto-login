@@ -1,17 +1,21 @@
 
-import pyautogui
-pyautogui.PAUSE = 0
-
-from libs.Session import Session
-from processes.core import init_core
-from processes.login import init_login
-
-from argparse import ArgumentParser
 import json
+from argparse import ArgumentParser
 
-import logging
+from libs.Session import Process, Session
+from processes.core import init_core, Core_Info
+from processes.login import init_login, Login_Info
+from processes.crafting import init_crafting, Crafting_Info
+from processes.testbench import init_testbench, Testbench_Info
+from processes.home import Home_Info, init_home
+
+import pyautogui
 import traceback
+import logging
 from libs.logging_util import configure_logger
+
+### Import option settings ###
+pyautogui.PAUSE = 0
 
 ### Argument Parsing ###
 arg_psr = ArgumentParser()
@@ -19,37 +23,37 @@ arg_psr.add_argument('--fast_login', action='store_true', help="Continusly check
 arg_psr.add_argument('--log_level', type=str, default='INFO', help="Log Level: DEBUG, INFO, WARNING, ERROR, CRITICAL")
 args = arg_psr.parse_args()
 
+def cleanup():
+    core_info._tracking_thread.running = False
+
 try:
     ### Set up logging ###
-    # Configure root logger
+    # Root Logger
     configure_logger(logging.getLogger(), level_name=args.log_level)
 
-
-    ### Load Configurations ###
-    with open("../res/config.json") as config_file:
-        config = json.load(config_file)
-
-
     ### Setup Base Session ###
-    # Start up core processes
     session = Session()
-    core_info = init_core(session)
-
-    # Start up login processes
-    login_info = init_login(session, config, core_info, args.fast_login)
-    if(not args.fast_login):
-        logging.info("Press Alt+Ctrl+F to start login process")
-
+    core_info = Core_Info()
+    session.add_process(Process("Core", init_core, core_info))
+    session.add_process(Process("Home", init_home, Home_Info()))
+    session.add_process(Process("Login", init_login, Login_Info(fast_login=args.fast_login)))
+    session.add_process(Process("Crafting", init_crafting, Crafting_Info()))
+    session.add_process(Process("Testbench", init_testbench,  Testbench_Info()))
 
     ### Main loop ###
     try:
-        session.start()
+        session.start(cleanup)
     except KeyboardInterrupt:
         logging.debug("[Exiting] keyboard interrupt")
+        
         pass
+    session.cleanup()
 
 # Capture critical exceptions to print with logger
 except Exception as e:
     err_str:str = traceback.format_exc()
     err_str = err_str[:-1].replace('\n','\n\t')
     logging.critical("Unhandeld Exception Encountered\n\t" + err_str)
+
+# Close Extra Threads (if still open)
+core_info._tracking_thread.running = False
