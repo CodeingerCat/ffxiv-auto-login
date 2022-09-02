@@ -20,7 +20,7 @@ popd
 
 :: Start FFXIV atuo
 pushd %~dp0\src
-start python main.py --fast_login
+start python main.py
 popd
 
 @echo on

@@ -44,7 +44,7 @@ def open_home_window(session:Session, info:Home_Info):
         [sg.Button("Edit Password", metadata=ButtonCallback(open_password_menue, session, session.get_info("Login")) )],
         [sg.Button("Auto Crafting", metadata=ButtonCallback(open_crafting_menue, session, session.get_info("Crafting")) )],
         [sg.Button("Testbench", metadata=ButtonCallback(open_testbench_window, session, session.get_info("Testbench")) )]
-    ], margins=(100,None))
+    ], margins=(100,None), location=info.window_location)
     info._window_buttons = ["Edit Password", "Auto Crafting", "Testbench"]
 
     # Init main_menue task
@@ -53,20 +53,16 @@ def open_home_window(session:Session, info:Home_Info):
 def home_menue_task(session:Session, info:Home_Info):
     event, values = info.window.read(timeout=0)
 
-    # Check agains event callbacks
-    # if(event in info.menue_callbacks):
-    #     # Run event callback
-    #     return info.menue_callbacks[event](session, info)
-    # elif(event != sg.TIMEOUT_EVENT):
-    #     logging.warn(f"Core Menue -- Unrecognised menue event '{event}'.")
-
-    if(event == sg.TIMEOUT_EVENT):
-        pass
-    elif(event == sg.WINDOW_CLOSED):
+    if(event == sg.WINDOW_CLOSED):
         logging.info("Home menue closed, to open again you can press [Crtl+Alt+M]")
         info.window.close()
         info.window = None
         return False
+    
+    info.window_location = info.window.CurrentLocation()
+
+    if(event == sg.TIMEOUT_EVENT):
+        pass
     elif(event in info._window_buttons):
         btn_cb = info.window[event].metadata
         btn_cb.func(*(btn_cb.args))

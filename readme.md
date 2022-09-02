@@ -16,19 +16,9 @@ Currently the only qulity of life improvment it dose is enter your password into
 2. **Download**
 
     Download this project.
-
 3. **Virtual Enviroment**
 
     Run *update_venv.bat* witch should create a virtual enviroment and download needed Python packages.
-4. **Configurations**
-
-    This project stores your password for logging in, in a configuration file that needs to be set up.
-    To set up this file *src/init_config.py* will nead to be run within the Virtual Enviroment with the FFXIV password as a argument to it.
-
-    To do this you will nead to open up a command terminal and ether activate the Venv yourself of run *start_vent.bat* to activate it. Once the Venv is active enter the *src* directory and run *"python init_config.py -pwd [Password]"*, this should create the config file. 
-    
-    *NOTE: To update the password if need simpy use this same command from above with the new password.* 
-
 5. **Run FFXIV Auto**
 
     Now you can run *start_ffxiv_auto.bat*, wich will open up FFXIV Auto and the FFXIV launcher.  If both open up you just have to make shure FFXIV Launcher is fully visable on your main monitor and it will log you right in.
